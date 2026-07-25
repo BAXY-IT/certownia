@@ -13,9 +13,11 @@ function shq(s: string): string {
   return `'${s.replace(/'/g, "'\\''")}'`;
 }
 
-// Wildcards must be quoted so the shell doesn't glob them.
+// Single-quote EVERY domain (via shq) so the shell can neither glob a wildcard
+// nor act on any metacharacter — command safety must not depend on the caller's
+// input regex.
 function dFlags(domains: string[]): string {
-  return domains.map((d) => (d.includes("*") ? `-d '${d}'` : `-d ${d}`)).join(" ");
+  return domains.map((d) => `-d ${shq(d)}`).join(" ");
 }
 
 /** certbot certonly command matching the chosen challenge/environment. */

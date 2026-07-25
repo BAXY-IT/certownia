@@ -10,7 +10,7 @@ export default defineConfig({
   build: {
     target: "es2022",
     outDir: "dist",
-    sourcemap: true,
+    sourcemap: false, // don't ship source maps with the production bundle
   },
   server: {
     port: 5173,

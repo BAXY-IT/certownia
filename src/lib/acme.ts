@@ -209,6 +209,7 @@ export class AcmeClient {
     for (const authzUrl of order.authorizations) {
       const r = await this.signedRequest(authzUrl, "");
       const authz = r.json;
+      if (!authz) throw new AcmeError("unexpected", "Unexpected non-JSON authorization response");
       if (authz.status === "valid") continue; // already authorized (reused)
       const domain: string = authz.identifier.value;
       const wildcard: boolean = authz.wildcard === true;
@@ -252,7 +253,7 @@ export class AcmeClient {
       await this.signedRequest(c.challengeUrl, {});
     }
     for (const c of challenges) {
-      await this.pollUntil(c.authzUrl, ["valid", "invalid"], (authz) => {
+      await this.pollUntil(c.authzUrl, ["valid", "invalid", "deactivated", "expired", "revoked"], (authz) => {
         onProgress?.(c, authz.status);
       }).then((authz) => {
         if (authz.status !== "valid") {
@@ -277,7 +278,12 @@ export class AcmeClient {
       onProgress?.(o.status),
     );
     if (finalOrder.status !== "valid" || !finalOrder.certificate) {
-      throw new AcmeError("order", "Order did not reach a valid state");
+      // Surface the order's problem document (e.g. a CAA block) instead of a
+      // generic message — RFC 8555 §7.1.6.
+      throw new AcmeError(
+        finalOrder.error?.type ?? "order",
+        finalOrder.error?.detail ?? "Order did not reach a valid state",
+      );
     }
     const r = await this.signedRequest(finalOrder.certificate, "");
     return splitChain(r.text);
@@ -292,6 +298,7 @@ export class AcmeClient {
   ): Promise<any> {
     for (let i = 0; i < maxAttempts; i++) {
       const r = await this.signedRequest(url, "");
+      if (!r.json) throw new AcmeError("unexpected", "Unexpected non-JSON response while polling", r.status);
       onTick?.(r.json);
       if (terminal.includes(r.json.status)) return r.json;
       const wait = retryAfterMs(r.headers.get("retry-after")) ?? 3000;

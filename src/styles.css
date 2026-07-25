@@ -19,7 +19,7 @@
   --ink: #0b1b2b;
   --text: #0b1b2b;
   --text-dim: #0b1b2bb0;
-  --muted: #0b1b2b8a;
+  --muted: #0b1b2bbf; /* ~75% — reaches 4.5:1 (WCAG AA) on --paper for small text */
   --border: #0b1b2b1f;
   --border-bright: #0b1b2b38;
   --line: #0b1b2b16;
@@ -34,7 +34,7 @@
   --warn: #a9660a; /* BAXY amber — staging */
   --warn-fill: #f5a623;
   --warn-soft: #f5a62322;
-  --info: #1f7fce; /* BAXY blue */
+  --info: #186bb0; /* BAXY blue — darkened so white pill text clears 4.5:1 */
   --danger: #d0323b;
   --danger-soft: #d0323b14;
 
@@ -354,9 +354,6 @@ body {
   margin: 20px 0 0;
   max-width: 16ch;
   color: var(--ink);
-}
-.hero h1 .accent {
-  color: var(--accent);
 }
 .hero .lede {
   font-size: clamp(1.02rem, 2.1vw, 1.24rem);
@@ -699,14 +696,6 @@ input:focus-visible {
   cursor: not-allowed;
   box-shadow: none;
 }
-.btn-ink {
-  background: var(--ink);
-  color: var(--paper);
-}
-.btn-ink:hover {
-  background: var(--ink-2, var(--ink));
-  opacity: 0.92;
-}
 .btn-ghost {
   background: transparent;
   color: var(--text-dim);
@@ -886,9 +875,6 @@ input:focus-visible {
 .record-status.invalid {
   color: var(--danger);
 }
-.record-status.propagated {
-  color: var(--success);
-}
 .note {
   font-size: 0.82rem;
   color: var(--muted);
@@ -947,37 +933,57 @@ input:focus-visible {
 .provider a {
   color: var(--accent);
 }
-.host-select {
+.host-details {
   margin-top: 12px;
-  max-width: 100%;
   font-family: var(--font-mono);
   font-size: 0.82rem;
-  color: var(--ink);
-  background: var(--paper);
+}
+.host-details > summary {
+  cursor: pointer;
+  color: var(--accent);
+  padding: 8px 12px;
   border: 1px solid var(--border-bright);
   border-radius: 8px;
-  padding: 8px 12px;
-  cursor: pointer;
+  list-style: none;
+  user-select: none;
   transition: border-color 0.15s;
 }
-.host-select:hover {
+.host-details > summary::-webkit-details-marker {
+  display: none;
+}
+.host-details > summary::before {
+  content: "▸ ";
+}
+.host-details[open] > summary::before {
+  content: "▾ ";
+}
+.host-details > summary:hover {
   border-color: var(--accent);
 }
-.host-select:focus-visible {
-  border-color: var(--accent);
+.host-details > summary:focus-visible {
   outline: none;
+  border-color: var(--accent);
   box-shadow: var(--ring);
 }
-.host-select option {
-  background: var(--surface);
-  color: var(--ink);
-}
-.doh {
+.host-list {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  margin: 18px 0 6px;
   flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+.host-list a {
+  color: var(--ink);
+  text-decoration: none;
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  transition: border-color 0.15s, color 0.15s;
+}
+.host-list a:hover,
+.host-list a:focus-visible {
+  color: var(--accent);
+  border-color: var(--accent);
+  outline: none;
 }
 .doh-status {
   font-family: var(--font-mono);

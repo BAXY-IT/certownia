@@ -2,8 +2,6 @@ import type { Dict } from "../i18n.js";
 
 // German.
 export const de: Dict = {
-  "app.name": "BAXY SSL",
-  "app.tagline": "Kostenloses SSL-Zertifikat, direkt in deinem Browser",
   "app.poweredBy": "Ermöglicht durch Let's Encrypt",
 
   "hero.title": "Ein kostenloses SSL-Zertifikat in wenigen Minuten",
@@ -25,6 +23,8 @@ export const de: Dict = {
   "cfg.domains.hint":
     "Eine oder mehrere Domains (mit Leerzeichen oder Komma trennen). Wildcard * ist nur mit DNS-Validierung möglich.",
   "cfg.domains.placeholder": "example.com www.example.com",
+  "a11y.theme": "Helles/dunkles Design umschalten",
+  "a11y.language": "Sprache",
   "cfg.email.label": "E-Mail (optional)",
   "cfg.email.hint":
     "Let's Encrypt nutzt sie nur für Benachrichtigungen über das Ablaufen. Du kannst sie leer lassen.",
@@ -37,11 +37,8 @@ export const de: Dict = {
   "cfg.env.production.hint":
     "Stellt ein von Browsern als vertrauenswürdig eingestuftes Zertifikat aus. Es gelten die Limits von Let's Encrypt — nutze es, sobald dein Test erfolgreich war.",
   "cfg.keytype.label": "Schlüsseltyp",
-  "cfg.keytype.ecdsa": "ECDSA P-256 (empfohlen, schneller)",
-  "cfg.keytype.rsa2048": "RSA 2048",
   "cfg.keytype.info":
     "ECDSA P-256 — ein moderner, kurzer Schlüssel: schneller und leichter. Für neue Server empfohlen.\nRSA 2048 — der klassische Standard: läuft fast überall, auch auf älteren Systemen.\nRSA 4096 — ein längerer RSA-Schlüssel: größte Kompatibilität und mehr Sicherheitsreserve, aber langsamer.\nUnsicher? Behalte ECDSA P-256.",
-  "cfg.keytype.rsa4096": "RSA 4096 (größte Kompatibilität)",
   "cfg.keytype.ecdsa.short": "empfohlen, schneller",
   "cfg.keytype.rsa4096.short": "größte Kompatibilität",
   "cfg.challenge.label": "Verifizierungsmethode",
@@ -70,7 +67,6 @@ export const de: Dict = {
   "work.register": "Konto wird bei Let's Encrypt registriert…",
   "work.newOrder": "Zertifikatsbestellung wird erstellt…",
   "work.fetchChallenges": "Verifizierungsaufgaben werden abgerufen…",
-  "work.validating": "Domain-Verifizierung wird geprüft…",
   "work.finalizing": "Signieranfrage (CSR) wird gesendet…",
   "work.downloading": "Fertiges Zertifikat wird heruntergeladen…",
 
@@ -108,7 +104,6 @@ export const de: Dict = {
     "Die Propagationsprüfung nutzt die öffentlichen DNS-Server von Cloudflare und Google — an sie wird nur dein Domainname gesendet.",
 
   "provider.detected": "Erkannter DNS-Anbieter: {0}",
-  "provider.open": "Panel von {0} öffnen",
   "provider.hostList": "Panel deines Hosters öffnen…",
   "provider.steps":
     "Melde dich im Panel deines Hosters oder DNS-Anbieters an.\nÖffne die DNS-Einstellungen deiner Domain („DNS-Zone“ / „DNS bearbeiten“ / „DNS-Einträge“).\nFüge einen neuen TXT-Eintrag hinzu — nutze „Host/Name“ und „Wert“ aus der Tabelle oben.\nSpeichere und warte ein paar Minuten auf die Propagation.",
@@ -200,8 +195,6 @@ export const de: Dict = {
     "Wir konnten die Domain nicht verifizieren. Meist hat sich der Eintrag noch nicht verbreitet oder sein Wert stimmt nicht überein. Klicke auf “Erneut versuchen” — wir erzeugen einen neuen Eintrag: der Name bleibt gleich, nur der Wert ändert sich. Aktualisiere den Wert im DNS, prüfe die Propagation und verifiziere dann. Deine Domain und Einstellungen bleiben erhalten — du musst nicht von vorn beginnen.",
   "err.network":
     "Der Proxy-Server war nicht erreichbar. Prüfe, ob der ACME-Proxy läuft (siehe README), und versuche es erneut.",
-  "err.challengeFailed":
-    "Let's Encrypt konnte {0} nicht verifizieren. Prüfe, ob der Eintrag/die Datei exakt übereinstimmt und Zeit zum Verbreiten hatte.",
   "err.rateLimited":
     "Limit von Let's Encrypt erreicht. Nutze für Tests die Staging-Umgebung oder warte. Details in der Konsole.",
 

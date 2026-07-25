@@ -21,12 +21,22 @@ describe("checkHttpFile", () => {
     await expect(checkHttpFile("http://example.com/x", "y")).rejects.toThrow();
   });
 
-  it("passes the target URL to the relay, url-encoded", async () => {
+  it("relays the url-encoded target with an &-joined cache-buster and no-store", async () => {
     const spy = vi.fn(async (_url?: unknown, _init?: unknown) => new Response("y", { status: 200 }));
     vi.stubGlobal("fetch", spy);
     await checkHttpFile("http://ex.com/a?b=1", "y");
-    expect(String(spy.mock.calls[0][0])).toContain(
-      "api.allorigins.win/raw?url=" + encodeURIComponent("http://ex.com/a?b=1"),
-    );
+    const relayUrl = String(spy.mock.calls[0][0]);
+    const init = spy.mock.calls[0][1] as RequestInit;
+    expect(relayUrl.startsWith("https://api.allorigins.win/raw?url=")).toBe(true);
+    // target already has a query, so the cache-buster is joined with "&"
+    expect(relayUrl).toContain(encodeURIComponent("http://ex.com/a?b=1&cb="));
+    expect(init.cache).toBe("no-store");
+  });
+
+  it("joins the cache-buster with ? when the target URL has no query", async () => {
+    const spy = vi.fn(async (_url?: unknown, _init?: unknown) => new Response("y", { status: 200 }));
+    vi.stubGlobal("fetch", spy);
+    await checkHttpFile("http://ex.com/x", "y");
+    expect(String(spy.mock.calls[0][0])).toContain(encodeURIComponent("http://ex.com/x?cb="));
   });
 });

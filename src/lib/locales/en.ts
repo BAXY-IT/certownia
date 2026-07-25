@@ -2,8 +2,6 @@ import type { Dict } from "../i18n.js";
 
 // English — the default language and the fallback for any missing key.
 export const en: Dict = {
-  "app.name": "BAXY SSL",
-  "app.tagline": "Free SSL certificate, right in your browser",
   "app.poweredBy": "Powered by Let's Encrypt",
 
   "hero.title": "A free SSL certificate in minutes",
@@ -25,6 +23,8 @@ export const en: Dict = {
   "cfg.domains.hint":
     "One or more domains (separate with space or comma). Wildcard * is only possible with DNS validation.",
   "cfg.domains.placeholder": "example.com www.example.com",
+  "a11y.theme": "Toggle light/dark theme",
+  "a11y.language": "Language",
   "cfg.email.label": "Email (optional)",
   "cfg.email.hint":
     "Let's Encrypt uses it only for expiry notifications. You may leave it blank.",
@@ -37,11 +37,8 @@ export const en: Dict = {
   "cfg.env.production.hint":
     "Issues a browser-trusted certificate. Let's Encrypt rate limits apply — use once your test passed.",
   "cfg.keytype.label": "Key type",
-  "cfg.keytype.ecdsa": "ECDSA P-256 (recommended, faster)",
-  "cfg.keytype.rsa2048": "RSA 2048",
   "cfg.keytype.info":
     "ECDSA P-256 — a modern, short key: faster and lighter. Recommended for new servers.\nRSA 2048 — the classic standard: works almost everywhere, incl. older systems.\nRSA 4096 — a longer RSA key: widest compatibility and more security margin, but slower.\nNot sure? Keep ECDSA P-256.",
-  "cfg.keytype.rsa4096": "RSA 4096 (widest compatibility)",
   "cfg.keytype.ecdsa.short": "recommended, faster",
   "cfg.keytype.rsa4096.short": "widest compatibility",
   "cfg.challenge.label": "Verification method",
@@ -70,7 +67,6 @@ export const en: Dict = {
   "work.register": "Registering account with Let's Encrypt…",
   "work.newOrder": "Creating the certificate order…",
   "work.fetchChallenges": "Fetching verification challenges…",
-  "work.validating": "Checking domain verification…",
   "work.finalizing": "Sending the signing request (CSR)…",
   "work.downloading": "Downloading the finished certificate…",
 
@@ -108,7 +104,6 @@ export const en: Dict = {
     "The propagation check uses Cloudflare and Google public DNS — only your domain name is sent to them.",
 
   "provider.detected": "Detected DNS provider: {0}",
-  "provider.open": "Open the {0} panel",
   "provider.hostList": "Open your hosting panel…",
   "provider.steps":
     "Log in to your hosting or DNS provider's panel.\nOpen your domain's DNS settings (“DNS zone” / “Edit DNS” / “DNS records”).\nAdd a new TXT record — use the “Host/Name” and “Value” from the table above.\nSave and wait a few minutes for the change to propagate.",
@@ -200,8 +195,6 @@ export const en: Dict = {
     "We couldn't verify the domain. Usually the record hasn't propagated yet, or its value doesn't match. Click “Try again” — we'll generate a fresh record: the name stays the same, only the value changes. Update the value in DNS, check propagation, then verify. Your domain and settings are kept — no need to start over.",
   "err.network":
     "Could not reach the proxy server. Check that the ACME proxy is running (see README) and try again.",
-  "err.challengeFailed":
-    "Let's Encrypt could not verify {0}. Check the record/file matches exactly and had time to propagate.",
   "err.rateLimited":
     "Let's Encrypt rate limit reached. Use the staging environment for tests, or wait. Details in the console.",
 

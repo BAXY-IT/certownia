@@ -25,6 +25,9 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
+      # Gate the deploy on the same checks as CI so a red commit can't ship.
+      - run: npm run typecheck
+      - run: npm test
       # GITHUB_REPOSITORY is a built-in env var ("owner/repo"). For a project
       # Pages site served from /<repo>/, the Vite base must match. If you deploy
       # to a custom domain or a user/org page (served from "/"), set VITE_BASE=/.

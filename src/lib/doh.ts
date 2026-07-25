@@ -32,6 +32,11 @@ async function dohJson(name: string, type: string): Promise<DohJson | null> {
   return null;
 }
 
+// Strip the quotes DoH puts around a TXT value. This handles a SINGLE character
+// string only — enough for ACME dns-01 tokens (a 43-char base64url string, no
+// spaces, no escapes). It does NOT reassemble multi-string TXT records
+// ("aaa" "bbb") or decode DNS presentation-format escapes; don't reuse it for
+// arbitrary TXT lookups without extending it.
 function unquoteTxt(data: string): string {
   return data
     .trim()

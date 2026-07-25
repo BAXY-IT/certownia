@@ -5,13 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <!--
       Strict Content-Security-Policy. GitHub Pages can't set HTTP headers, so we
-      ship it as a meta tag. connect-src is the exact egress allowlist: Let's
-      Encrypt (prod + staging), the two DoH resolvers, and the http-01 relay —
-      nothing else. This is the main thing that stops an injected/tampered script
-      from exfiltrating a key. style-src needs 'unsafe-inline' only for inline
-      style="" attributes (no inline <script> exists, so script-src stays tight).
-      NOTE: if you build with an ABSOLUTE-origin VITE_ACME_PROXY, add its origin
-      to connect-src. frame-ancestors is ignored in a meta tag (needs a header).
+      ship it as a meta tag. script-src 'self' + no inline <script>/eval blocks the
+      most common XSS. connect-src is a tight egress allowlist: Let's Encrypt
+      (prod + staging), the two DoH resolvers, and the http-01 relay.
+      HONESTY NOTE: this REDUCES exfiltration surface but does not eliminate it —
+      api.allorigins.win is a general-purpose relay and the DoH resolvers are a
+      DNS side channel, so a fully-tampered bundle could still leak data over an
+      allowed host. The CSP is defense-in-depth, not a guarantee. style-src needs
+      'unsafe-inline' only for inline style="" attributes. NOTE: if you build with
+      an ABSOLUTE-origin VITE_ACME_PROXY, add its origin to connect-src.
+      frame-ancestors is ignored in a meta tag (needs a header — see public/_headers).
     -->
     <meta
       http-equiv="Content-Security-Policy"

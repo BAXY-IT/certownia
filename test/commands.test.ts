@@ -8,8 +8,8 @@ describe("buildCertbot", () => {
     expect(c).toContain("--manual --preferred-challenges dns");
     expect(c).toContain("--staging");
     expect(c).toContain("-m 'me@example.com'");
-    expect(c).toContain("-d example.com");
-    expect(c).toContain("-d www.example.com");
+    expect(c).toContain("-d 'example.com'");
+    expect(c).toContain("-d 'www.example.com'");
   });
 
   it("HTTP webroot, production, no email", () => {
@@ -19,10 +19,10 @@ describe("buildCertbot", () => {
     expect(c).toContain("--register-unsafely-without-email");
   });
 
-  it("quotes wildcard domains so the shell doesn't glob them", () => {
+  it("single-quotes every domain so the shell can't glob or interpret them", () => {
     const c = buildCertbot(["*.example.com", "example.com"], "dns-01", false);
     expect(c).toContain("-d '*.example.com'");
-    expect(c).toContain("-d example.com");
+    expect(c).toContain("-d 'example.com'");
   });
 
   it("shell-quotes the email and escapes single quotes", () => {
@@ -40,7 +40,7 @@ describe("buildCertbotDnsCloudflare", () => {
     const c = buildCertbotDnsCloudflare(["example.com", "*.example.com"], "me@example.com");
     expect(c).toContain("--dns-cloudflare --dns-cloudflare-credentials ~/.secrets/cloudflare.ini");
     expect(c).toContain("-m 'me@example.com'");
-    expect(c).toContain("-d example.com");
+    expect(c).toContain("-d 'example.com'");
     expect(c).toContain("-d '*.example.com'");
     expect(c).not.toContain("--manual");
   });

@@ -47,6 +47,7 @@ const ICON = {
   arrow: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m0 0l-6-6m6 6l-6 6"/></svg>`,
   sun: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19"/></svg>`,
   info: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 8h.01"/></svg>`,
+  moon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>`,
 };
 
 // ---------------------------------------------------------------- state
@@ -114,6 +115,7 @@ let checkBtn: HTMLButtonElement | null = null;
 let gateNote: HTMLElement | null = null;
 let escapeNote: HTMLElement | null = null;
 let verifying = false; // a verification is in flight — block re-entrancy
+let checking = false; // a propagation check is in flight — block re-entrancy
 let verifyForced = false; // user chose "verify anyway" past the DoH gate
 let checkedPending = false; // a manual propagation check came back not-visible
 
@@ -153,7 +155,7 @@ function updateVerifyGate(): void {
   }
   const allowed = verifyAllowed();
   if (verifyBtn) verifyBtn.disabled = !allowed;
-  if (checkBtn) checkBtn.disabled = false;
+  if (checkBtn) checkBtn.disabled = checking; // don't re-enable a check that's mid-flight
   if (gateNote) gateNote.style.display = allowed ? "none" : "block";
   // Offer an escape only once the user has actively checked and it's still not
   // visible (covers a resolver false-negative on a record that is really live).
@@ -242,8 +244,15 @@ function renderHeader(): HTMLElement {
     el("div", { class: "header-actions" }, [
       el(
         "button",
-        { class: "icon-btn", type: "button", "aria-label": "Theme", onclick: toggleTheme },
-        [icon(ICON.sun)],
+        {
+          id: "theme-btn",
+          class: "icon-btn",
+          type: "button",
+          "aria-label": t("a11y.theme"),
+          "aria-pressed": state.theme === "dark" ? "true" : "false",
+          onclick: toggleTheme,
+        },
+        [icon(state.theme === "dark" ? ICON.sun : ICON.moon)],
       ),
       renderLangSelect(),
     ]),
@@ -255,7 +264,7 @@ function renderHeader(): HTMLElement {
 function renderLangSelect(): HTMLElement {
   const sel = el(
     "select",
-    { class: "lang-select", "aria-label": "Language", onchange: onLangChange },
+    { id: "lang-select", class: "lang-select", "aria-label": t("a11y.language"), onchange: onLangChange },
     LANGS.map((l) => el("option", { value: l.code }, [l.label])),
   );
   sel.value = getLang();
@@ -267,6 +276,7 @@ function renderLangSelect(): HTMLElement {
 function onLangChange(e: Event): void {
   setLang((e.target as HTMLSelectElement).value as Lang);
   render();
+  document.getElementById("lang-select")?.focus(); // render() rebuilt the DOM
 }
 
 function renderStage(): HTMLElement {
@@ -486,7 +496,8 @@ function renderConfig(): HTMLElement {
     if (typeof cfg === "string") {
       errBox.textContent = cfg;
       errBox.style.display = "block";
-      errBox.scrollIntoView({ behavior: "smooth", block: "center" });
+      const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+      errBox.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center" });
       return;
     }
     state.config = cfg;
@@ -557,7 +568,10 @@ function renderWork(): HTMLElement {
   );
   return el("section", { class: "view" }, [
     stepper(state.workLines.includes("work.finalizing") ? 2 : 1),
-    el("div", { class: "panel" }, [el("h2", {}, [t("work.preparing")]), el("div", { class: "worklog" }, lines)]),
+    el("div", { class: "panel" }, [
+      el("h2", {}, [t("work.preparing")]),
+      el("div", { class: "worklog", role: "status", "aria-live": "polite" }, lines),
+    ]),
   ]);
 }
 
@@ -632,7 +646,7 @@ function renderChallenge(): HTMLElement {
       children.push(btns);
     }
     // reachability / propagation status (both methods)
-    const dohNode = el("div", { class: "doh-status", "data-doh": key });
+    const dohNode = el("div", { class: "doh-status", "data-doh": key, role: "status", "aria-live": "polite" });
     const cachedDoh = dohStatus.get(key);
     if (cachedDoh) fillDohNode(dohNode, cachedDoh);
     children.push(dohNode);
@@ -769,6 +783,8 @@ function setDoh(key: string, status: DohStatus): void {
 }
 
 async function checkAllPropagation(btn?: HTMLButtonElement): Promise<void> {
+  if (checking) return; // a check is already running — don't hammer the resolvers/relay
+  checking = true;
   const isDns = state.config?.challenge === "dns-01";
   const checkLabel = isDns ? t("doh.check") : t("http.check");
   if (btn) {
@@ -799,30 +815,35 @@ async function checkAllPropagation(btn?: HTMLButtonElement): Promise<void> {
       updateVerifyGate();
     }
   } finally {
+    checking = false;
     if (btn) {
-      // Stay disabled if a verification started while this check was in flight.
-      btn.disabled = verifying;
+      // Restore the button's label (the disabled state is set by updateVerifyGate below).
       btn.replaceChildren(document.createTextNode(checkLabel));
     }
+    // Refresh the gate now that `checking` is cleared. Critical for the auto
+    // (no-btn) path: its final setDoh() ran while checking===true and left the
+    // Check button disabled, and without this call nothing would re-enable it —
+    // soft-locking the DNS-01 screen. updateVerifyGate re-derives checkBtn's
+    // disabled state from `checking`/`verifying`, so it's correct for both paths.
+    updateVerifyGate();
   }
 }
 
-// Dropdown of popular hosting/DNS panels — selecting one opens its login page.
-// Replaces the single "open the detected provider" link so the user can reach
-// their own host even when detection missed it.
+// Collapsible list of popular hosting/DNS panels, each a real link. A native
+// <select> would fire window.open on every keyboard arrow-key change (opening a
+// tab per keypress — WCAG 3.2.2/3.2.5); a <details> of links only navigates on an
+// explicit Enter/click, which is the correct control for an action menu.
 function hostingDropdown(): HTMLElement {
-  const sel = el("select", { class: "host-select", "aria-label": t("provider.hostList"), onchange: onHostSelect }, [
-    el("option", { value: "" }, [t("provider.hostList")]),
-    ...HOSTING_PANELS.map((h) => el("option", { value: h.url }, [h.name])),
+  return el("details", { class: "host-details" }, [
+    el("summary", {}, [t("provider.hostList")]),
+    el(
+      "div",
+      { class: "host-list" },
+      HOSTING_PANELS.map((h) =>
+        el("a", { href: h.url, target: "_blank", rel: "noopener noreferrer" }, [h.name]),
+      ),
+    ),
   ]);
-  return sel;
-}
-
-function onHostSelect(e: Event): void {
-  const sel = e.target as HTMLSelectElement;
-  const url = sel.value;
-  sel.value = ""; // reset to the placeholder so it can be used again
-  if (url) window.open(url, "_blank", "noopener");
 }
 
 function fillProviderNode(node: HTMLElement, info: ProviderInfo | null): void {
@@ -1081,6 +1102,7 @@ function toggleTheme(): void {
     /* ignore */
   }
   render();
+  document.getElementById("theme-btn")?.focus(); // render() rebuilt the DOM
 }
 
 function resetFlow(): void {
@@ -1089,8 +1111,13 @@ function resetFlow(): void {
   resetEnrichment();
   resetGate();
   recordChanged = false;
+  // Null all four challenge-screen refs together (they now point at detached
+  // nodes); state.accountKey is deliberately kept so "generate another" reuses
+  // the same ACME account.
   verifyBtn = null;
+  checkBtn = null;
   gateNote = null;
+  escapeNote = null;
   state.certKey = null;
   state.order = null;
   state.challenges = [];
@@ -1261,8 +1288,16 @@ async function runVerify(btn: HTMLButtonElement): Promise<void> {
     // order terminal, so "Try again" on the error screen creates a fresh order
     // for the SAME domains — same record name, new value.
     console.error("[certownia]", e);
+    const transient =
+      e instanceof AcmeError &&
+      (e.type === "timeout" || e.isBadNonce || e.type === "unexpected" || e.type === "nonce");
     if (e instanceof AcmeError && e.isRateLimit) {
       state.error = `${t("err.rateLimited")}\n\n${e.detail}`;
+    } else if (transient) {
+      // Not a terminal authorization failure — the order is likely still pending
+      // and reusable, so DON'T mark it dead (a fresh order would force the user to
+      // publish a new DNS value for nothing).
+      state.error = `${t("err.network")}\n\n${(e as AcmeError).detail}`;
     } else if (e instanceof AcmeError) {
       state.error = `${t("err.verifyFailed")}\n\n${e.detail}`;
       // The authorization is terminally invalid — mark the saved order dead so a
@@ -1327,12 +1362,15 @@ async function runFinalize(): Promise<void> {
     setLog("work.finalizing", "active");
     if (!state.certKey) state.certKey = await generateCertKey(cfg.keyType); // resumed session
     const csr = await csrToAcmeBase64url(cfg.domains, state.certKey);
+    // Export the private key BEFORE finalize: if this WebCrypto export ever fails,
+    // it must not happen AFTER the certificate is already issued (a retry would
+    // then re-order and burn a duplicate-certificate rate-limit slot).
+    state.privateKeyPem = await exportPrivateKeyPem(state.certKey.privateKey);
+    state.certKey = null; // PEM captured — drop the extractable key from memory
     state.bundle = await state.client!.finalize(state.order!, csr);
     setLog("work.finalizing", "done");
 
     setLog("work.downloading", "active");
-    state.privateKeyPem = await exportPrivateKeyPem(state.certKey.privateKey);
-    state.certKey = null; // PEM captured — drop the extractable key from memory
     setLog("work.downloading", "done");
 
     clearSession(); // certificate issued — the pending session is done

@@ -2,8 +2,6 @@ import type { Dict } from "../i18n.js";
 
 // Portuguese (European, pt-PT).
 export const pt: Dict = {
-  "app.name": "BAXY SSL",
-  "app.tagline": "Certificado SSL gratuito, mesmo no seu navegador",
   "app.poweredBy": "Com a tecnologia de Let's Encrypt",
 
   "hero.title": "Um certificado SSL gratuito em minutos",
@@ -25,6 +23,8 @@ export const pt: Dict = {
   "cfg.domains.hint":
     "Um ou mais domínios (separe com espaço ou vírgula). O wildcard * só é possível com validação DNS.",
   "cfg.domains.placeholder": "example.com www.example.com",
+  "a11y.theme": "Alternar tema claro/escuro",
+  "a11y.language": "Idioma",
   "cfg.email.label": "E-mail (opcional)",
   "cfg.email.hint":
     "Let's Encrypt usa-o apenas para avisos de expiração. Pode deixar em branco.",
@@ -37,11 +37,8 @@ export const pt: Dict = {
   "cfg.env.production.hint":
     "Emite um certificado de confiança para os navegadores. Aplicam-se os limites de Let's Encrypt — use quando o seu teste tiver passado.",
   "cfg.keytype.label": "Tipo de chave",
-  "cfg.keytype.ecdsa": "ECDSA P-256 (recomendado, mais rápido)",
-  "cfg.keytype.rsa2048": "RSA 2048",
   "cfg.keytype.info":
     "ECDSA P-256 — uma chave moderna e curta: mais rápida e leve. Recomendada para servidores novos.\nRSA 2048 — o padrão clássico: funciona quase em todo o lado, incl. sistemas antigos.\nRSA 4096 — uma chave RSA mais longa: máxima compatibilidade e mais margem de segurança, mas mais lenta.\nNão tem a certeza? Mantenha ECDSA P-256.",
-  "cfg.keytype.rsa4096": "RSA 4096 (maior compatibilidade)",
   "cfg.keytype.ecdsa.short": "recomendado, mais rápido",
   "cfg.keytype.rsa4096.short": "maior compatibilidade",
   "cfg.challenge.label": "Método de verificação",
@@ -70,7 +67,6 @@ export const pt: Dict = {
   "work.register": "A registar a conta em Let's Encrypt…",
   "work.newOrder": "A criar o pedido de certificado…",
   "work.fetchChallenges": "A obter os desafios de verificação…",
-  "work.validating": "A verificar a validação do domínio…",
   "work.finalizing": "A enviar o pedido de assinatura (CSR)…",
   "work.downloading": "A descarregar o certificado concluído…",
 
@@ -108,10 +104,9 @@ export const pt: Dict = {
     "A verificação da propagação usa os DNS públicos da Cloudflare e da Google — só lhes é enviado o nome do seu domínio.",
 
   "provider.detected": "Fornecedor de DNS detetado: {0}",
-  "provider.open": "Abrir o painel {0}",
-  "provider.hostList": "Abrir o painel do teu alojamento…",
+  "provider.hostList": "Abrir o painel do seu alojamento…",
   "provider.steps":
-    "Inicia sessão no painel do teu alojamento ou fornecedor de DNS.\nAbre as definições de DNS do teu domínio (“Zona DNS” / “Editar DNS” / “Registos DNS”).\nAdiciona um novo registo TXT — usa “Host/Nome” e “Valor” da tabela acima.\nGuarda e aguarda alguns minutos pela propagação.",
+    "Inicie sessão no painel do seu alojamento ou fornecedor de DNS.\nAbra as definições de DNS do seu domínio (“Zona DNS” / “Editar DNS” / “Registos DNS”).\nAdicione um novo registo TXT — use “Host/Nome” e “Valor” da tabela acima.\nGuarde e aguarde alguns minutos pela propagação.",
   "provider.generic": "Adicione o registo no painel de DNS do seu fornecedor de domínio.",
 
   "http.where.title": "Onde colocar o ficheiro",
@@ -200,8 +195,6 @@ export const pt: Dict = {
     "Não conseguimos verificar o domínio. Normalmente o registo ainda não se propagou, ou o seu valor não corresponde. Clique em “Tentar novamente” — vamos gerar um novo registo: o nome mantém-se, muda apenas o valor. Atualize o valor no DNS, verifique a propagação e só depois verifique. O seu domínio e as suas definições são guardados — não precisa de começar de novo.",
   "err.network":
     "Não foi possível contactar o servidor proxy. Verifique se o proxy ACME está a funcionar (consulte o README) e tente novamente.",
-  "err.challengeFailed":
-    "Let's Encrypt não conseguiu verificar {0}. Confirme que o registo/ficheiro corresponde exatamente e teve tempo para propagar.",
   "err.rateLimited":
     "Limite de utilização de Let's Encrypt atingido. Use o ambiente de testes (staging) para experimentar, ou aguarde. Detalhes na consola.",
 

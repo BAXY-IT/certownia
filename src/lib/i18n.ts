@@ -92,7 +92,7 @@ export function t(key: string, ...args: (string | number)[]): string {
   const dict = DICTS[current];
   let s = dict[key] ?? en[key] ?? key;
   args.forEach((a, i) => {
-    s = s.replace(`{${i}}`, String(a));
+    s = s.replaceAll(`{${i}}`, String(a)); // replace every occurrence, not just the first
   });
   return s;
 }

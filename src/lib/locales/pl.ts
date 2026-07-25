@@ -2,8 +2,6 @@ import type { Dict } from "../i18n.js";
 
 // Polish.
 export const pl: Dict = {
-  "app.name": "BAXY SSL",
-  "app.tagline": "Darmowy certyfikat SSL prosto w przeglądarce",
   "app.poweredBy": "Napędzane przez Let's Encrypt",
 
   "hero.title": "Darmowy certyfikat SSL w kilka minut",
@@ -25,6 +23,8 @@ export const pl: Dict = {
   "cfg.domains.hint":
     "Jedna lub kilka domen (oddziel spacją lub przecinkiem). Wildcard * jest możliwy tylko z weryfikacją DNS.",
   "cfg.domains.placeholder": "example.com www.example.com",
+  "a11y.theme": "Przełącz motyw jasny/ciemny",
+  "a11y.language": "Język",
   "cfg.email.label": "E-mail (opcjonalnie)",
   "cfg.email.hint":
     "Let's Encrypt użyje go tylko do powiadomień o wygasaniu certyfikatu. Możesz zostawić puste.",
@@ -37,11 +37,8 @@ export const pl: Dict = {
   "cfg.env.production.hint":
     "Wystawia certyfikat zaufany przez przeglądarki. Obowiązują limity Let's Encrypt — używaj, gdy test przeszedł.",
   "cfg.keytype.label": "Typ klucza",
-  "cfg.keytype.ecdsa": "ECDSA P-256 (zalecane, szybsze)",
-  "cfg.keytype.rsa2048": "RSA 2048",
   "cfg.keytype.info":
     "ECDSA P-256 — nowoczesny, krótki klucz: szybszy i lżejszy. Zalecany dla nowych serwerów.\nRSA 2048 — klasyczny standard: działa niemal wszędzie, także na starszym sprzęcie.\nRSA 4096 — dłuższy klucz RSA: największa zgodność i zapas bezpieczeństwa, ale wolniejszy.\nNie wiesz? Zostaw ECDSA P-256.",
-  "cfg.keytype.rsa4096": "RSA 4096 (najszersza zgodność)",
   "cfg.keytype.ecdsa.short": "zalecane, szybsze",
   "cfg.keytype.rsa4096.short": "najszersza zgodność",
   "cfg.challenge.label": "Sposób weryfikacji",
@@ -70,7 +67,6 @@ export const pl: Dict = {
   "work.register": "Rejestruję konto w Let's Encrypt…",
   "work.newOrder": "Tworzę zamówienie certyfikatu…",
   "work.fetchChallenges": "Pobieram zadania weryfikacyjne…",
-  "work.validating": "Sprawdzam weryfikację domeny…",
   "work.finalizing": "Wysyłam żądanie podpisania (CSR)…",
   "work.downloading": "Pobieram gotowy certyfikat…",
 
@@ -108,7 +104,6 @@ export const pl: Dict = {
     "Sprawdzanie propagacji korzysta z publicznych serwerów DNS Cloudflare i Google — wysyłamy im tylko nazwę Twojej domeny.",
 
   "provider.detected": "Wykryty dostawca DNS: {0}",
-  "provider.open": "Otwórz panel {0}",
   "provider.hostList": "Otwórz panel swojego hostingu…",
   "provider.steps":
     "Zaloguj się do panelu swojego hostingu lub dostawcy DNS.\nWejdź w ustawienia DNS domeny („Strefa DNS” / „Edycja DNS” / „Rekordy DNS”).\nDodaj nowy rekord typu TXT — użyj „Host/Nazwa” i „Wartość” z tabeli powyżej.\nZapisz i poczekaj kilka minut na propagację.",
@@ -200,8 +195,6 @@ export const pl: Dict = {
     "Nie udało się potwierdzić domeny. Najczęściej rekord nie zdążył się jeszcze rozpropagować albo jego wartość się nie zgadza. Kliknij „Spróbuj ponownie” — wygenerujemy świeży rekord: nazwa zostaje taka sama, zmienia się tylko wartość. Zaktualizuj wartość w DNS, sprawdź propagację i dopiero wtedy weryfikuj. Twoja domena i ustawienia są zapamiętane — nie musisz zaczynać od zera.",
   "err.network":
     "Nie udało się połączyć z serwerem pośredniczącym. Sprawdź, czy proxy ACME działa (patrz README), i spróbuj ponownie.",
-  "err.challengeFailed":
-    "Let's Encrypt nie potwierdził weryfikacji dla {0}. Sprawdź, czy rekord/plik jest dokładnie taki jak podano i czy zdążył się rozpropagować.",
   "err.rateLimited":
     "Osiągnięto limit Let's Encrypt. Użyj środowiska testowego (staging) do prób lub poczekaj. Szczegóły w konsoli.",
 
